@@ -792,7 +792,7 @@ class MultiHeadModel_ExtraSkip(nn.Module):
     
     
 ###################### pytorch implementations ############ now using pytorch for efficiency and to ensure no mistakes in implmentations
-class MultiHeadModel_PyTorch(nn.Module):
+class MultiHeadModel_PyTorch(nn.Module): # a multi headed version of the SAT model with skips and using pytorchs multiheadattention
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -823,14 +823,14 @@ class MultiHeadModel_PyTorch(nn.Module):
         adjust_w_skip = adjustment + attention_add_normed
         adjust_add_normed =  self.layer_norm_2(adjust_w_skip)
         
-        #adjusted_output = adjust_add_normed + decoder_x
+        #adjusted_output = adjust_add_normed + decoder_x # final skip layer intially proposed but not used
 
         out = self.lm_head(adjust_add_normed)
         
         return out
     
 ###################### pytorch implementations
-class MultiHeadModel_PyTorch(nn.Module):
+class MultiHeadModel_PyTorch(nn.Module): # redefiniton with minor change to skip layer now commented out
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -870,8 +870,9 @@ class MultiHeadModel_PyTorch(nn.Module):
         return out
     
     
-    
-class PositionalEncoding(nn.Module): # ref https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial6/Transformers_and_MHAttention.html
+# START: COPIED with edits FROM <https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial6/Transformers_and_MHAttention.html>
+ 
+class PositionalEncoding(nn.Module): # a positional ecoding I found that I thought may be helpful
 
     def __init__(self, d_model, max_len=5000):
         """
@@ -901,14 +902,14 @@ class PositionalEncoding(nn.Module): # ref https://uvadlc-notebooks.readthedocs.
         x = x + self.pe[:, :x.size(0)].squeeze(0)
         return x
     
+ # END: COPIED and editted FROM <https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial6/Transformers_and_MHAttention.html>    
     
     
     
     
     
     
-    
-class MultiHeadModel_PyTorch_Positional(nn.Module):
+class MultiHeadModel_PyTorch_Positional(nn.Module): # one SAT cross attentionw with positiona embeddings.
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -953,7 +954,7 @@ class MultiHeadModel_PyTorch_Positional(nn.Module):
     
     
     
-class MultiHeadModel_PyTorch_Stacked_One_Alt(nn.Module):
+class MultiHeadModel_PyTorch_Stacked_One_Alt(nn.Module): # attempting to use self attention as well
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -1017,7 +1018,7 @@ class MultiHeadModel_PyTorch_Stacked_One_Alt(nn.Module):
     
     
     
-class MultiHeadModel_PyTorch_Stacked(nn.Module):
+class MultiHeadModel_PyTorch_Stacked(nn.Module): # two SAT cross attention modules stacked
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -1079,7 +1080,7 @@ class MultiHeadModel_PyTorch_Stacked(nn.Module):
 
         return out
     
-class MultiHeadModel_PyTorch_Stacked_Positional(nn.Module):
+class MultiHeadModel_PyTorch_Stacked_Positional(nn.Module): # **model used in paper!!!** two SAT cross attention modules stacked
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -1090,21 +1091,22 @@ class MultiHeadModel_PyTorch_Stacked_Positional(nn.Module):
         self.d_dim = decoder_dim
         self.heads = heads
         # print(self.d_dim/self.heads)
-        self.positional_encoding = PositionalEncoding(d_model=int(self.d_dim))
+        self.positional_encoding = PositionalEncoding(d_model=int(self.d_dim)) # adding positional encoding
+        # below is the cross attention head the norm layers and the feed forward module (position-wise)
         self.Multi_Head_Cross_Attention = torch.nn.MultiheadAttention(self.d_dim, self.heads, dropout=0.0, bias=True, add_bias_kv=False, add_zero_attn=False, kdim=self.e_dim, vdim=self.e_dim, batch_first=False, device=device, dtype=None)
         self.layer_norm_1 = nn.LayerNorm(self.d_dim)
         self.FF = nn.Linear(self.d_dim, self.d_dim).to(device)
         self.Relu = nn.ReLU().to(device)
         self.FF2 = nn.Linear(self.d_dim, self.d_dim).to(device)
         self.layer_norm_2 = nn.LayerNorm(self.d_dim)
-        
+        # second SAT cross attention module
         self.Multi_Head_Cross_Attention_2 =  torch.nn.MultiheadAttention(self.d_dim, self.heads, dropout=0.0, bias=True, add_bias_kv=False, add_zero_attn=False, kdim=self.e_dim, vdim=self.e_dim, batch_first=False, device=device, dtype=None)
         self.layer_norm_3 = nn.LayerNorm(self.d_dim)
         self.FF3 = nn.Linear(self.d_dim, self.d_dim).to(device)
         self.Relu_2 = nn.ReLU().to(device)
         self.FF4 = nn.Linear(self.d_dim, self.d_dim).to(device)
         self.layer_norm_4 = nn.LayerNorm(self.d_dim)
-        
+        # GPT LM head used but frozen at top of file
         self.lm_head = lm_head
         
     def forward(self, encoder_x, decoder_x):
@@ -1142,7 +1144,7 @@ class MultiHeadModel_PyTorch_Stacked_Positional(nn.Module):
         return out
     
     
-    
+# other attempts below are still being expiermented with and have various levels of performance.
 class MultiHeadModel_PyTorch_Stacked_Triple_Alt(nn.Module):
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
