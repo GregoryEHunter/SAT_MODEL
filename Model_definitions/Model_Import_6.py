@@ -21,7 +21,7 @@ for param in head_model.parameters():
 
 lm_head = head_model.lm_head
 
-class CrossAttentionSingle(nn.Module):
+class CrossAttentionSingle(nn.Module): # a selfmade crossattention module
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         """
@@ -70,7 +70,7 @@ class CrossAttentionSingle(nn.Module):
         return attention
     
     
-class ProposedModel(nn.Module):
+class ProposedModel(nn.Module): # a very basic intial attempt at the proposed model from the midterm
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         """
@@ -148,7 +148,7 @@ class Block(nn.Module):
         # print(output.shape)
         return adjusted_output
     
-class BlockFixedSkipM(nn.Module):
+class BlockFixedSkipM(nn.Module): # trying different skip layers
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         """
@@ -192,7 +192,7 @@ class BlockFixedSkipM(nn.Module):
         # print(output.shape)
         return adjust_add_normed
     
-class DeeperModel(nn.Module):
+class DeeperModel(nn.Module): # Stacking multiple old models on top of each other
     
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
@@ -209,7 +209,7 @@ class DeeperModel(nn.Module):
         return out
         
         
-class Test_skip_norm_model(nn.Module):
+class Test_skip_norm_model(nn.Module): # adding add norms etc and testing it
     
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
@@ -221,7 +221,7 @@ class Test_skip_norm_model(nn.Module):
     
         return out
         
-class DeeperModel_skip(nn.Module):
+class DeeperModel_skip(nn.Module): # a deeper model with skips
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = Block(encoder_dim, decoder_dim, attention_dim)
@@ -236,7 +236,7 @@ class DeeperModel_skip(nn.Module):
         out = self.lm_head(out)
         return out
 
-class WiderModel_skip(nn.Module):
+class WiderModel_skip(nn.Module): # using multiple heads with skips (these are wider than the final model to reduce paramertization)
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = Block(encoder_dim, decoder_dim, attention_dim)
@@ -256,7 +256,7 @@ class WiderModel_skip(nn.Module):
         out = self.lm_head(out)
         return out
     
-class WiderBlock(nn.Module):
+class WiderBlock(nn.Module): # making the wider model into blocks in order to stack them
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = Block(encoder_dim, decoder_dim, attention_dim)
@@ -293,7 +293,7 @@ class WiderDeeperModel_skip(nn.Module):
         return out
     
     
-class WiderDeeperModel_Alt(nn.Module):
+class WiderDeeperModel_Alt(nn.Module): # alternating cross attention and self attention
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = WiderBlock(encoder_dim, decoder_dim, attention_dim)
@@ -310,7 +310,7 @@ class WiderDeeperModel_Alt(nn.Module):
         out = self.lm_head(out_4)
         return out
     
-class WiderDeeperModel_2(nn.Module):
+class WiderDeeperModel_2(nn.Module): # a 2 deep model utilizing the wider self made blocks
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = WiderBlock(encoder_dim, decoder_dim, attention_dim)
@@ -323,7 +323,7 @@ class WiderDeeperModel_2(nn.Module):
         out = self.lm_head(out_2)
         return out
     
-class WiderBlock_8(nn.Module):
+class WiderBlock_8(nn.Module): # 8 wide model not stacked again not using pytorch yet
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = Block(encoder_dim, decoder_dim, attention_dim)
@@ -351,7 +351,7 @@ class WiderBlock_8(nn.Module):
         out = self.narrow(combined_heads)
         out = self.lm_head(out)
         return out
-class WiderBlock_8_AllSkip(nn.Module):
+class WiderBlock_8_AllSkip(nn.Module): # adding skips
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = Block(encoder_dim, decoder_dim, attention_dim)
@@ -381,7 +381,7 @@ class WiderBlock_8_AllSkip(nn.Module):
         out = self.lm_head(out)
         return out
     
-class WiderBlock_8_FixedM(nn.Module):
+class WiderBlock_8_FixedM(nn.Module): # different skips that were more toward what i intially thout it would be
     def __init__(self, encoder_dim, decoder_dim, attention_dim = None):
         super().__init__()
         self.block_1 = BlockFixedSkipM(encoder_dim, decoder_dim, attention_dim)
@@ -411,7 +411,7 @@ class WiderBlock_8_FixedM(nn.Module):
         out = self.lm_head(out)
         return out
 
-class MultiHeadBlock(nn.Module):
+class MultiHeadBlock(nn.Module): # multi head block for stacking with a concatination stradegy again expiementation
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -472,7 +472,7 @@ class MultiHeadBlock(nn.Module):
         # print(output.shape)
         return adjusted_output
         # return adjust_add_normed
-class MultiHeadBlockExtraSkip(nn.Module):
+class MultiHeadBlockExtraSkip(nn.Module): # testing performance with more skip layers
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -533,7 +533,7 @@ class MultiHeadBlockExtraSkip(nn.Module):
         # print(output.shape)
         return adjusted_output
     
-class MultiHeadModel(nn.Module):
+class MultiHeadModel(nn.Module): # combinding these expiermental blocks
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -549,7 +549,7 @@ class MultiHeadModel(nn.Module):
         return out
     
     
-class MultiHeadBlock_WOFinalSkip(nn.Module):
+class MultiHeadBlock_WOFinalSkip(nn.Module): # playing with skips because performance is effected
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -610,7 +610,7 @@ class MultiHeadBlock_WOFinalSkip(nn.Module):
         # print(output.shape)
         return adjust_add_normed
 
-class MultiHeadBlock_WOAnySkip(nn.Module):
+class MultiHeadBlock_WOAnySkip(nn.Module): # expierment without any skip layers
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -670,7 +670,7 @@ class MultiHeadBlock_WOAnySkip(nn.Module):
         # print(adjusted_output.shape)
         # print(output.shape)
         return adjust_add_normed
-class MultiHeadBlock_WTwoSkip(nn.Module):
+class MultiHeadBlock_WTwoSkip(nn.Module): # expierment with two skips identified to be important
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -731,7 +731,7 @@ class MultiHeadBlock_WTwoSkip(nn.Module):
         # print(output.shape)
         return adjust_add_normed
     
-class MultiHeadModel_WOFinalBlockSkip(nn.Module):
+class MultiHeadModel_WOFinalBlockSkip(nn.Module): # playing with skips
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -745,7 +745,7 @@ class MultiHeadModel_WOFinalBlockSkip(nn.Module):
         out = self.lm_head(out)
         
         return out
-class MultiHeadModel_WOAnyBlockSkip(nn.Module):
+class MultiHeadModel_WOAnyBlockSkip(nn.Module): #playing with skips
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
         """
@@ -791,7 +791,7 @@ class MultiHeadModel_ExtraSkip(nn.Module):
     
     
     
-###################### pytorch implementations
+###################### pytorch implementations ############ now using pytorch for efficiency and to ensure no mistakes in implmentations
 class MultiHeadModel_PyTorch(nn.Module):
     # def __init__(self, max_length):
     def __init__(self, encoder_dim, decoder_dim, heads = 4, attention_dim = None):
